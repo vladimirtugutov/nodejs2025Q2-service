@@ -52,7 +52,7 @@ export class AlbumService {
   //   if (index === -1) throw new NotFoundException('Album not found');
   //   this.albums.splice(index, 1);
   // }
-  
+
   delete(id: string): void {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
     const index = this.albums.findIndex((a) => a.id === id);

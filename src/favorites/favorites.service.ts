@@ -25,38 +25,38 @@ export class FavoritesService {
   ) {}
 
   findAll() {
-  return {
-    artists: this.favorites.artists
-      .map((id) => {
-        try {
-          return this.artistService.findOne(id);
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean),
+    return {
+      artists: this.favorites.artists
+        .map((id) => {
+          try {
+            return this.artistService.findOne(id);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean),
 
-    albums: this.favorites.albums
-      .map((id) => {
-        try {
-          return this.albumService.findOne(id);
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean),
+      albums: this.favorites.albums
+        .map((id) => {
+          try {
+            return this.albumService.findOne(id);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean),
 
-    tracks: this.favorites.tracks
-      .map((id) => {
-        try {
-          return this.trackService.findOne(id);
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean),
-  };
-}
+      tracks: this.favorites.tracks
+        .map((id) => {
+          try {
+            return this.trackService.findOne(id);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean),
+    };
+  }
 
   add(type: keyof Favorites, id: string) {
     if (!isUUID(id)) {
@@ -75,7 +75,9 @@ export class FavoritesService {
       }
     } catch (e) {
       if (e instanceof NotFoundException) {
-        throw new UnprocessableEntityException(`${type.slice(0, -1)} not found`);
+        throw new UnprocessableEntityException(
+          `${type.slice(0, -1)} not found`,
+        );
       }
       throw e;
     }

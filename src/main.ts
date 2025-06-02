@@ -7,9 +7,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,               // удаляет лишние поля
-      forbidNonWhitelisted: true,   // выбрасывает ошибку, если поле не разрешено
-      transform: true,              // автоматически преобразует payload в нужный тип
+      whitelist: true, // удаляет лишние поля
+      forbidNonWhitelisted: true, // выбрасывает ошибку, если поле не разрешено
+      transform: true, // автоматически преобразует payload в нужный тип
     }),
   );
 

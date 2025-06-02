@@ -11,8 +11,8 @@ export class FavoritesController {
   }
 
   @Post('track/:id')
-    @HttpCode(201)
-    addTrack(@Param('id') id: string) {
+  @HttpCode(201)
+  addTrack(@Param('id') id: string) {
     this.favoritesService.add('tracks', id);
     return { message: 'Track added to favorites' };
   }
