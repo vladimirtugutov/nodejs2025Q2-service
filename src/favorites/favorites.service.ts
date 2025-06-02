@@ -26,7 +26,9 @@ export class FavoritesService {
 
   findAll() {
     return {
-      artists: this.favorites.artists.map((id) => this.artistService.findOne(id)),
+      artists: this.favorites.artists.map((id) =>
+        this.artistService.findOne(id),
+      ),
       albums: this.favorites.albums.map((id) => this.albumService.findOne(id)),
       tracks: this.favorites.tracks.map((id) => this.trackService.findOne(id)),
     };
@@ -45,7 +47,8 @@ export class FavoritesService {
       // not found
     }
 
-    if (!exists) throw new UnprocessableEntityException(`${type.slice(0, -1)} not found`);
+    if (!exists)
+      throw new UnprocessableEntityException(`${type.slice(0, -1)} not found`);
 
     if (!this.favorites[type].includes(id)) {
       this.favorites[type].push(id);
@@ -55,7 +58,8 @@ export class FavoritesService {
   remove(type: keyof Favorites, id: string) {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
     const index = this.favorites[type].indexOf(id);
-    if (index === -1) throw new NotFoundException(`${type.slice(0, -1)} is not favorite`);
+    if (index === -1)
+      throw new NotFoundException(`${type.slice(0, -1)} is not favorite`);
     this.favorites[type].splice(index, 1);
   }
 

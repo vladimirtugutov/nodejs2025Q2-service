@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUserDto, UpdatePasswordDto } from './user.dto';
 import { randomUUID } from 'crypto';
@@ -9,15 +14,20 @@ export class UserService {
   private users: User[] = [];
 
   findAll(): Omit<User, 'password'>[] {
-    return this.users.map(({ password, ...rest }) => rest);
+    return this.users.map((user) => {
+      const copy = { ...user };
+      delete copy.password;
+      return copy;
+    });
   }
 
   findOne(id: string): Omit<User, 'password'> {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
     const user = this.users.find((u) => u.id === id);
     if (!user) throw new NotFoundException('User not found');
-    const { password, ...rest } = user;
-    return rest;
+    const copy = { ...user };
+    delete copy.password;
+    return copy;
   }
 
   create(dto: CreateUserDto): Omit<User, 'password'> {
@@ -30,20 +40,23 @@ export class UserService {
       updatedAt: Date.now(),
     };
     this.users.push(newUser);
-    const { password, ...rest } = newUser;
-    return rest;
+    const copy = { ...newUser };
+    delete copy.password;
+    return copy;
   }
 
   update(id: string, dto: UpdatePasswordDto): Omit<User, 'password'> {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
     const user = this.users.find((u) => u.id === id);
     if (!user) throw new NotFoundException('User not found');
-    if (user.password !== dto.oldPassword) throw new ForbiddenException('Wrong old password');
+    if (user.password !== dto.oldPassword)
+      throw new ForbiddenException('Wrong old password');
     user.password = dto.newPassword;
     user.version++;
     user.updatedAt = Date.now();
-    const { password, ...rest } = user;
-    return rest;
+    const copy = { ...user };
+    delete copy.password;
+    return copy;
   }
 
   delete(id: string): void {
