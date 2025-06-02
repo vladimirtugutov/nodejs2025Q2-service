@@ -25,30 +25,60 @@ export class FavoritesService {
   ) {}
 
   findAll() {
-    return {
-      artists: this.favorites.artists.map((id) =>
-        this.artistService.findOne(id),
-      ),
-      albums: this.favorites.albums.map((id) => this.albumService.findOne(id)),
-      tracks: this.favorites.tracks.map((id) => this.trackService.findOne(id)),
-    };
-  }
+  return {
+    artists: this.favorites.artists
+      .map((id) => {
+        try {
+          return this.artistService.findOne(id);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean),
+
+    albums: this.favorites.albums
+      .map((id) => {
+        try {
+          return this.albumService.findOne(id);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean),
+
+    tracks: this.favorites.tracks
+      .map((id) => {
+        try {
+          return this.trackService.findOne(id);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean),
+  };
+}
 
   add(type: keyof Favorites, id: string) {
-    if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
-
-    let exists = false;
-    try {
-      if (type === 'artists') this.artistService.findOne(id);
-      if (type === 'albums') this.albumService.findOne(id);
-      if (type === 'tracks') this.trackService.findOne(id);
-      exists = true;
-    } catch {
-      // not found
+    if (!isUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
     }
 
-    if (!exists)
-      throw new UnprocessableEntityException(`${type.slice(0, -1)} not found`);
+    try {
+      if (type === 'artists') {
+        this.artistService.findOne(id);
+      } else if (type === 'albums') {
+        this.albumService.findOne(id);
+      } else if (type === 'tracks') {
+        this.trackService.findOne(id);
+      } else {
+        throw new BadRequestException('Invalid entity type');
+      }
+    } catch (e) {
+      if (e instanceof NotFoundException) {
+        throw new UnprocessableEntityException(`${type.slice(0, -1)} not found`);
+      }
+      throw e;
+    }
 
     if (!this.favorites[type].includes(id)) {
       this.favorites[type].push(id);
@@ -56,10 +86,15 @@ export class FavoritesService {
   }
 
   remove(type: keyof Favorites, id: string) {
-    if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
+    if (!isUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
     const index = this.favorites[type].indexOf(id);
-    if (index === -1)
+    if (index === -1) {
       throw new NotFoundException(`${type.slice(0, -1)} is not favorite`);
+    }
+
     this.favorites[type].splice(index, 1);
   }
 
