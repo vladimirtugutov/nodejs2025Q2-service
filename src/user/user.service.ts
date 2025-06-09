@@ -12,6 +12,7 @@ const prisma = new PrismaClient();
 
 const toResponse = (user: User) => {
   const { password, createdAt, updatedAt, ...rest } = user;
+  void password;
   return {
     ...rest,
     createdAt: +new Date(createdAt),
