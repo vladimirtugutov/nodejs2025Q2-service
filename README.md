@@ -98,6 +98,17 @@ npm run scan
 ```
 
 
+## Docker Hub
+
+This project is also available as Docker image:  
+ https://hub.docker.com/r/tugutov/home-library
+
+To pull:
+
+```bash
+docker pull tugutov/home-library
+
+```
 
 ### Auto-fix and format
 
