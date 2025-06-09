@@ -64,8 +64,40 @@ docker-compose up --build
 
 ```
 
-
 NestJS app will be available at: http://localhost:4000
+
+
+
+### Vulnerability Scan
+
+Trivy Installation (Windows):
+- Download the latest release of Trivy CLI for Windows from the GitHub Releases page.
+
+- Extract the trivy.exe file.
+
+- Add the folder with trivy.exe to your system PATH:
+
+- Press Win + R, type sysdm.cpl, go to Advanced > Environment Variables.
+
+- Under System variables, select Path and click Edit.
+
+- Click New, add the folder path with trivy.exe, click OK.
+
+Now you can run Trivy from any terminal like so:
+
+```bash
+trivy image nodejs2025q2-service-app
+
+```
+
+To scan the Docker image for known vulnerabilities:
+
+```bash
+npm run scan
+
+```
+
+
 
 ### Auto-fix and format
 
