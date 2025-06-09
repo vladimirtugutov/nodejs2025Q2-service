@@ -7,3 +7,7 @@ Dockerfile
 docker-compose.yml
 *.log
 test
+tests
+*.spec.ts
+*.test.ts
+coverage

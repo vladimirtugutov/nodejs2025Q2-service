@@ -1,27 +1,22 @@
 # Этап 1: билд
-FROM node:22-alpine as builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-COPY . .
-
+COPY prisma ./prisma
 RUN npx prisma generate
-
+COPY tsconfig*.json ./
+COPY src ./src
 RUN npm run build
 
 # Этап 2: продакшн
 FROM node:22-alpine
 
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm ci --omit=dev
-
+RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
-COPY prisma ./prisma
-
+COPY --from=builder /app/prisma ./prisma
 CMD ["npm", "run", "start:prod"]
