@@ -9,10 +9,60 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   login     String
   password  String
   version   Int
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  favorites Favorites[] 
+}
+
+model Artist {
+  id     String      @id @default(uuid())
+  name   String
+  grammy Boolean
+
+  albums       Album[]
+  tracks       Track[]
+  favoritedBy  Favorites[] @relation("ArtistFavorite") 
+}
+
+model Album {
+  id       String      @id @default(uuid())
+  name     String
+  year     Int
+  artistId String?
+
+  artist       Artist?    @relation(fields: [artistId], references: [id])
+  tracks       Track[]
+  favoritedBy  Favorites[] @relation("AlbumFavorite") 
+}
+
+model Track {
+  id       String      @id @default(uuid())
+  name     String
+  duration Int
+  artistId String?
+  albumId  String?
+
+  artist       Artist?    @relation(fields: [artistId], references: [id])
+  album        Album?     @relation(fields: [albumId], references: [id])
+  favoritedBy  Favorites[] @relation("TrackFavorite") 
+}
+
+model Favorites {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+
+  artist    Artist?  @relation("ArtistFavorite", fields: [artistId], references: [id])
+  artistId  String?  @unique
+
+  album     Album?   @relation("AlbumFavorite", fields: [albumId], references: [id])
+  albumId   String?  @unique
+
+  track     Track?   @relation("TrackFavorite", fields: [trackId], references: [id])
+  trackId   String?  @unique
 }

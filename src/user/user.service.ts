@@ -4,17 +4,26 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { CreateUserDto, UpdatePasswordDto } from './user.dto';
 import { validate as isUUID } from 'uuid';
 
 const prisma = new PrismaClient();
 
+const toResponse = (user: User) => {
+  const { password, createdAt, updatedAt, ...rest } = user;
+  return {
+    ...rest,
+    createdAt: +new Date(createdAt),
+    updatedAt: +new Date(updatedAt),
+  };
+};
+
 @Injectable()
 export class UserService {
   async findAll() {
     const users = await prisma.user.findMany();
-    return users.map(({ password, ...rest }) => rest);
+    return users.map(toResponse);
   }
 
   async findOne(id: string) {
@@ -23,8 +32,7 @@ export class UserService {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
 
-    const { password, ...rest } = user;
-    return rest;
+    return toResponse(user);
   }
 
   async create(dto: CreateUserDto) {
@@ -39,8 +47,7 @@ export class UserService {
       },
     });
 
-    const { password, ...rest } = user;
-    return rest;
+    return toResponse(user);
   }
 
   async update(id: string, dto: UpdatePasswordDto) {
@@ -60,8 +67,7 @@ export class UserService {
       },
     });
 
-    const { password, ...rest } = updated;
-    return rest;
+    return toResponse(updated);
   }
 
   async delete(id: string): Promise<void> {
