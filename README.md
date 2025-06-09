@@ -64,14 +64,14 @@ docker-compose up --build
 
 ```
 
-NestJS app will be available at: http://localhost:4000
+NestJS app will be available at: http://localhost:{.env.port}
 
 
 
 ### Vulnerability Scan
 
 Trivy Installation (Windows):
-- Download the latest release of Trivy CLI for Windows from the GitHub Releases page.
+- Download the latest release of Trivy CLI for Windows from the GitHub Releases page (https://github.com/aquasecurity/trivy/releases).
 
 - Extract the trivy.exe file.
 
@@ -101,12 +101,12 @@ npm run scan
 ## Docker Hub
 
 This project is also available as Docker image:  
- https://hub.docker.com/r/tugutov/home-library
+ https://hub.docker.com/r/tugutov/nodejs2025q2-service-app
 
 To pull:
 
 ```bash
-docker pull tugutov/home-library
+docker pull tugutov/nodejs2025q2-service-app
 
 ```
 
