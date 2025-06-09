@@ -17,5 +17,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
+COPY prisma ./prisma
 
-CMD ["node", "dist/main"]
+# Простой старт, без миграций на этом этапе
+CMD ["npm", "run", "start:prod"]

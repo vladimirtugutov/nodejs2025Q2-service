@@ -3,21 +3,23 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    restart: always
     container_name: postgres-db
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: homelibrary
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
     networks:
       - app-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   app:
     build: .
-    restart: always
     container_name: nest-app
+    restart: always
     depends_on:
       - postgres
     ports:
@@ -28,7 +30,7 @@ services:
       - app-network
     volumes:
       - .:/app
-      - /app/node_modules
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
 volumes:
   pgdata:

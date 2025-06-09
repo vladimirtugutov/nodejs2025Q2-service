@@ -4,65 +4,73 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { User } from './user.entity';
+import { PrismaClient } from '@prisma/client';
 import { CreateUserDto, UpdatePasswordDto } from './user.dto';
-import { randomUUID } from 'crypto';
 import { validate as isUUID } from 'uuid';
+
+const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
-
-  findAll(): Omit<User, 'password'>[] {
-    return this.users.map((user) => {
-      const copy = { ...user };
-      delete copy.password;
-      return copy;
-    });
+  async findAll() {
+    const users = await prisma.user.findMany();
+    return users.map(({ password, ...rest }) => rest);
   }
 
-  findOne(id: string): Omit<User, 'password'> {
+  async findOne(id: string) {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
-    const user = this.users.find((u) => u.id === id);
+
+    const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    const copy = { ...user };
-    delete copy.password;
-    return copy;
+
+    const { password, ...rest } = user;
+    return rest;
   }
 
-  create(dto: CreateUserDto): Omit<User, 'password'> {
-    const newUser: User = {
-      id: randomUUID(),
-      login: dto.login,
-      password: dto.password,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    this.users.push(newUser);
-    const copy = { ...newUser };
-    delete copy.password;
-    return copy;
+  async create(dto: CreateUserDto) {
+    const now = new Date();
+    const user = await prisma.user.create({
+      data: {
+        login: dto.login,
+        password: dto.password,
+        version: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+
+    const { password, ...rest } = user;
+    return rest;
   }
 
-  update(id: string, dto: UpdatePasswordDto): Omit<User, 'password'> {
+  async update(id: string, dto: UpdatePasswordDto) {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
-    const user = this.users.find((u) => u.id === id);
+
+    const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
     if (user.password !== dto.oldPassword)
       throw new ForbiddenException('Wrong old password');
-    user.password = dto.newPassword;
-    user.version++;
-    user.updatedAt = Date.now();
-    const copy = { ...user };
-    delete copy.password;
-    return copy;
+
+    const updated = await prisma.user.update({
+      where: { id },
+      data: {
+        password: dto.newPassword,
+        version: user.version + 1,
+        updatedAt: new Date(),
+      },
+    });
+
+    const { password, ...rest } = updated;
+    return rest;
   }
 
-  delete(id: string): void {
+  async delete(id: string): Promise<void> {
     if (!isUUID(id)) throw new BadRequestException('Invalid UUID');
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) throw new NotFoundException('User not found');
-    this.users.splice(index, 1);
+
+    try {
+      await prisma.user.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException('User not found');
+    }
   }
 }
