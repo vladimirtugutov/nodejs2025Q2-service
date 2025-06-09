@@ -52,7 +52,20 @@ To run only specific test suite with authorization
 
 ```
 npm run test:auth -- <path to suite>
+
 ```
+
+### Containerization 
+
+Build and run all containers (NestJS app + PostgreSQL):
+
+```
+docker-compose up --build
+
+```
+
+
+NestJS app will be available at: http://localhost:4000
 
 ### Auto-fix and format
 
