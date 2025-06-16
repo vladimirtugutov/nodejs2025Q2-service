@@ -22,6 +22,8 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() dto: RefreshTokenDto) {
+    console.log('BODY RAW', dto);
+
     return this.authService.refreshToken(dto);
   }
 }

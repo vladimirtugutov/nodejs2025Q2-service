@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -61,15 +65,29 @@ export class AuthService {
   }
 
   async refreshToken(dto: RefreshTokenDto) {
+    const { refreshToken } = dto;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
     try {
-      const payload = await this.jwtService.verifyAsync(dto.refreshToken, {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
 
       const newPayload = {
-        sub: payload.sub,
+        sub:
+          payload.sub ||
+          payload.userId ||
+          payload.user_id ||
+          payload.sub?.toString(),
         login: payload.login,
       };
+
+      if (!newPayload.sub || !newPayload.login) {
+        throw new ForbiddenException('Invalid or malformed refresh token');
+      }
 
       return {
         accessToken: this.jwtService.sign(newPayload, {
@@ -82,7 +100,7 @@ export class AuthService {
         }),
       };
     } catch (e) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new ForbiddenException('Invalid or expired refresh token');
     }
   }
 }
