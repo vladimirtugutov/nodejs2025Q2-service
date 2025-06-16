@@ -39,11 +39,11 @@ export class UserService {
 
   async create(dto: CreateUserDto) {
     const now = new Date();
-    const hashedPassword = await bcrypt.hash(dto.password, 10); // 👈 обязательно
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = await prisma.user.create({
       data: {
         login: dto.login,
-        password: hashedPassword, // 👈 сохраняем хеш
+        password: hashedPassword,
         version: 1,
         createdAt: now,
         updatedAt: now,
@@ -58,13 +58,19 @@ export class UserService {
 
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    if (user.password !== dto.oldPassword)
-      throw new ForbiddenException('Wrong old password');
+
+    const isPasswordValid = await bcrypt.compare(
+      dto.oldPassword,
+      user.password,
+    );
+    if (!isPasswordValid) throw new ForbiddenException('Wrong old password');
+
+    const hashedNewPassword = await bcrypt.hash(dto.newPassword, 10);
 
     const updated = await prisma.user.update({
       where: { id },
       data: {
-        password: dto.newPassword,
+        password: hashedNewPassword,
         version: user.version + 1,
         updatedAt: new Date(),
       },

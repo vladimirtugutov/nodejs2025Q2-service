@@ -10,7 +10,10 @@ import {
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto, UpdateArtistDto } from './artist.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}

@@ -10,7 +10,10 @@ import {
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto, UpdateTrackDto } from './track.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
