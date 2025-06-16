@@ -1,4 +1,4 @@
-# Home Library Service
+# Home Library Service - REST service: Logging & Error Handling and Authentication and Authorization
 
 ## Prerequisites
 
