@@ -7,6 +7,7 @@ import {
 import { PrismaClient, User } from '@prisma/client';
 import { CreateUserDto, UpdatePasswordDto } from './user.dto';
 import { validate as isUUID } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -38,10 +39,11 @@ export class UserService {
 
   async create(dto: CreateUserDto) {
     const now = new Date();
+    const hashedPassword = await bcrypt.hash(dto.password, 10); // 👈 обязательно
     const user = await prisma.user.create({
       data: {
         login: dto.login,
-        password: dto.password,
+        password: hashedPassword, // 👈 сохраняем хеш
         version: 1,
         createdAt: now,
         updatedAt: now,

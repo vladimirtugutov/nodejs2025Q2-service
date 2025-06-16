@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD  } from '@nestjs/core';
 import { LoggingService } from './logger/logging.service';
 import { HttpExceptionFilter } from './logger/http-exception.filter';
 import { LoggingInterceptor } from './logger/logging.interceptor';
@@ -11,6 +11,10 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtModule } from '@nestjs/jwt';
+
 
 @Module({
   imports: [
@@ -20,6 +24,8 @@ import { FavoritesModule } from './favorites/favorites.module';
     AlbumModule,
     TrackModule,
     FavoritesModule,
+    AuthModule,
+    JwtModule.register({}),
   ],
   controllers: [AppController],
   providers: [AppService, LoggingService,
@@ -30,6 +36,10 @@ import { FavoritesModule } from './favorites/favorites.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },],
   exports: [LoggingService],
 })
