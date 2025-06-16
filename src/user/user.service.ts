@@ -80,4 +80,8 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
   }
+
+  async getByLogin(login: string) {
+    return prisma.user.findUnique({ where: { login } });
+  }
 }
