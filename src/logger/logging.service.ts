@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  LoggerService,
-  LogLevel,
-} from '@nestjs/common';
+import { Injectable, LoggerService, LogLevel } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -42,20 +38,27 @@ export class LoggingService implements LoggerService {
 
   private shouldLog(level: LogLevel): boolean {
     const levels: LogLevel[] = ['error', 'warn', 'log', 'debug', 'verbose'];
-    return (
-      levels.indexOf(level) <=
-      levels.indexOf(this.logLevel)
-    );
+    return levels.indexOf(level) <= levels.indexOf(this.logLevel);
   }
 
-  private format(level: string, message: any, context?: string, trace?: string): string {
+  private format(
+    level: string,
+    message: any,
+    context?: string,
+    trace?: string,
+  ): string {
     const time = new Date().toISOString();
     return `[${time}] [${level.toUpperCase()}]${context ? ` [${context}]` : ''} ${message}${
       trace ? `\nTRACE: ${trace}` : ''
     }\n`;
   }
 
-  private write(level: LogLevel, message: any, context?: string, trace?: string) {
+  private write(
+    level: LogLevel,
+    message: any,
+    context?: string,
+    trace?: string,
+  ) {
     if (!this.shouldLog(level)) return;
     const formatted = this.format(level, message, context, trace);
     this.logStream.write(formatted);

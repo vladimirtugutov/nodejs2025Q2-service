@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD  } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { LoggingService } from './logger/logging.service';
 import { HttpExceptionFilter } from './logger/http-exception.filter';
 import { LoggingInterceptor } from './logger/logging.interceptor';
@@ -15,7 +15,6 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -28,7 +27,9 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({}),
   ],
   controllers: [AppController],
-  providers: [AppService, LoggingService,
+  providers: [
+    AppService,
+    LoggingService,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
@@ -40,7 +41,8 @@ import { JwtModule } from '@nestjs/jwt';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },],
+    },
+  ],
   exports: [LoggingService],
 })
 export class AppModule {}
