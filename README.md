@@ -1,5 +1,16 @@
 # Home Library Service
 
+# Important Notice
+ 
+⚠️ **The tests are not working with Node.js version 25 or higher** ⚠️
+
+Due to compatibility issues with the `jsonwebtoken` library and its dependencies, the e2e tests will fail with the error.
+
+**Solution:** Please use **Node.js v24.11.1 LTS** or any stable version in the v22.x or v24.x range.
+
+- ✅ **Recommended:** Node.js v24.11.1 LTS
+- ✅ **Also works:** Node.js v22.x LTS
+
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
