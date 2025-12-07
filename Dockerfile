@@ -13,17 +13,16 @@ COPY tsconfig*.json ./
 COPY src ./src
 RUN npm run build
 
+RUN npm prune --production && npm cache clean --force
+
 # Этап 2: продакшн
 FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --omit=dev
-
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/package*.json ./
 
 CMD ["npm", "run", "start:prod"]
