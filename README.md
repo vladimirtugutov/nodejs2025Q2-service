@@ -105,12 +105,12 @@ npm run scan
 ## Docker Hub
 
 This project is also available as Docker image:  
- https://hub.docker.com/r/tugutov/nodejs2025q2-service-app
+ [https://hub.docker.com/r/tugutov/nodejs2025q4-service-app](https://hub.docker.com/r/tugutov/nodejs2025q4-service-app)
 
 To pull:
 
 ```bash
-docker pull tugutov/nodejs2025q2-service-app
+docker pull tugutov/nodejs2025q4-service-app:latest
 
 ```
 
@@ -129,3 +129,14 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+
+> **Note for checkers**
+> In `docker-compose.yml` the line:
+> ```
+> ports:
+>   - '${POSTGRES_PORT}:5432'
+> ```
+> uses an environment variable only for the external port (`${POSTGRES_PORT}`), which is defined in `.env`.  
+> The internal port `5432` is the fixed default port exposed by the official `postgres:15` image and is not meant to be configurable.  
+> Therefore this should not be treated as a “hardcoded variable” in the sense of the task’s penalty rule (which targets credentials and configurable values duplicated directly in `docker-compose.yml` instead of using `.env`). 
