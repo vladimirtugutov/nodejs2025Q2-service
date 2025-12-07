@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    networks:
+      - app-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    image: nodejs2025q4-service-app
+    container_name: nest-app
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    env_file:
+      - .env
+    networks:
+      - app-network
+    # volumes:
+    #   - .:/app
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge

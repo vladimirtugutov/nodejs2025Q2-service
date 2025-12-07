@@ -21,10 +21,10 @@ components:
         version:
           type: number
           example: 1
-        createAt:
+        createdAt:
           type: number
           example: 1655000000
-        updateAt:
+        updatedAt:
           type: number
           example: 1655000000
       required:
@@ -745,7 +745,7 @@ paths:
       tags:
         - Favorites
       summary: Get all favorites
-      description: Gets all favorites movies, tracks and books
+      description: Gets all favorite tracks, albums and artists
       responses:
         200:
           description: Successful operation
