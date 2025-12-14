@@ -17,8 +17,22 @@ git clone {repository URL}
 npm install
 ```
 
-## Adding .env file
-fill it with your data, use .env.example as an example 
+## Environment setup (Docker + local Node)
+
+1.	Create `.env` file based on `.env.example` and set database URL to use `localhost` (because Prisma and tests will run on the host).
+Note: host is `localhost`, not `postgres`, because `npx prisma migrate deploy` and tests are executed outside Docker.
+2. Start PostgreSQL via Docker. Run only the Postgres service from `docker-compose.yml`:
+    ```
+    docker compose up postgres -d
+    ```
+    This will start PostgreSQL container, and expose it on `localhost:5432` (make sure your `docker-compose.yml` maps port `5432:5432`).
+
+3. Apply database migrations. With Postgres container running and `.env` configured, apply Prisma migrations from the host:
+
+    ```
+    npx prisma migrate deploy
+    ```
+    Prisma will connect to `localhost:5432` using `DATABASE_URL` from `.env`.
 
 ## Running application
 
@@ -28,19 +42,9 @@ npm start
 
 ## Testing
 
-After application running open new terminal and enter:
+Before running tests make sure PostgreSQL is running and accessible with the same `DATABASE_URL` as in `.env`. Apply the steps from *Environment setup*.
 
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
+Then, in another terminal, run tests:
 
 To run all test with authorization
 
@@ -55,61 +59,6 @@ npm run test:auth -- <path to suite>
 
 ```
 
-### Containerization 
-
-Build and run all containers (NestJS app + PostgreSQL):
-
-```
-docker-compose up --build
-
-```
-
-NestJS app will be available at: http://localhost:{.env.port}
-
-
-
-### Vulnerability Scan
-
-Trivy Installation (Windows):
-- Download the latest release of Trivy CLI for Windows from the GitHub Releases page (https://github.com/aquasecurity/trivy/releases).
-
-- Extract the trivy.exe file.
-
-- Add the folder with trivy.exe to your system PATH:
-
-- Press Win + R, type sysdm.cpl, go to Advanced > Environment Variables.
-
-- Under System variables, select Path and click Edit.
-
-- Click New, add the folder path with trivy.exe, click OK.
-
-Now you can run Trivy from any terminal like so:
-
-```bash
-trivy image nodejs2025q2-service-app
-
-```
-
-To scan the Docker image for known vulnerabilities:
-
-```bash
-npm run scan
-
-```
-
-
-## Docker Hub
-
-This project is also available as Docker image:  
- https://hub.docker.com/r/tugutov/nodejs2025q2-service-app
-
-To pull:
-
-```bash
-docker pull tugutov/nodejs2025q2-service-app
-
-```
-
 ### Auto-fix and format
 
 ```
@@ -119,9 +68,3 @@ npm run lint
 ```
 npm run format
 ```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
