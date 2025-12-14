@@ -12,12 +12,12 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 const toResponse = (user: User) => {
-  const { password, createdAt, updatedAt, ...rest } = user;
+  const { password, ...rest } = user;
   void password;
   return {
     ...rest,
-    createdAt: +new Date(createdAt),
-    updatedAt: +new Date(updatedAt),
+    createdAt: +user.createdAt,
+    updatedAt: +user.updatedAt,
   };
 };
 
@@ -40,17 +40,23 @@ export class UserService {
   async create(dto: CreateUserDto) {
     const now = new Date();
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const user = await prisma.user.create({
-      data: {
-        login: dto.login,
-        password: hashedPassword,
-        version: 1,
-        createdAt: now,
-        updatedAt: now,
-      },
-    });
-
-    return toResponse(user);
+    try {
+      const user = await prisma.user.create({
+        data: {
+          login: dto.login,
+          password: hashedPassword,
+          version: 1,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
+      return toResponse(user);
+    } catch (e: any) {
+      if (e.code === 'P2002' && e.meta?.target?.includes('login')) {
+        throw new BadRequestException('Login must be unique');
+      }
+      throw e;
+    }
   }
 
   async update(id: string, dto: UpdatePasswordDto) {
