@@ -1,4 +1,4 @@
-# Home Library Service
+# Home Library Service - REST service: Logging & Error Handling and Authentication and Authorization
 
 ## Prerequisites
 
@@ -17,31 +17,34 @@ git clone {repository URL}
 npm install
 ```
 
+## Environment setup (Docker + local Node)
+
+1.	Create `.env` file based on `.env.example` and set database URL to use `localhost` (because Prisma and tests will run on the host).
+Note: host is `localhost`, not `postgres`, because `npx prisma migrate deploy` and tests are executed outside Docker.
+2. Start PostgreSQL via Docker. Run only the Postgres service from `docker-compose.yml`:
+    ```
+    docker compose up postgres -d
+    ```
+    This will start PostgreSQL container, and expose it on `localhost:5432` (make sure your `docker-compose.yml` maps port `5432:5432`).
+
+3. Apply database migrations. With Postgres container running and `.env` configured, apply Prisma migrations from the host:
+
+    ```
+    npx prisma migrate deploy
+    ```
+    Prisma will connect to `localhost:5432` using `DATABASE_URL` from `.env`.
+
 ## Running application
 
 ```
 npm start
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
-
 ## Testing
 
-After application running open new terminal and enter:
+Before running tests make sure PostgreSQL is running and accessible with the same `DATABASE_URL` as in `.env`. Apply the steps from *Environment setup*.
 
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
+Then, in another terminal, run tests:
 
 To run all test with authorization
 
@@ -53,6 +56,7 @@ To run only specific test suite with authorization
 
 ```
 npm run test:auth -- <path to suite>
+
 ```
 
 ### Auto-fix and format
@@ -64,9 +68,3 @@ npm run lint
 ```
 npm run format
 ```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
